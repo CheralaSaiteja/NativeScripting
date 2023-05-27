@@ -6,7 +6,7 @@ Native Scripting API is an open source library written in c++. It provides a sim
 
 Native Scripting API only supports linux and mac at present.
 
-Native Scripting is licensed under the GPL.
+Native Scripting is licensed under the LGPLv3.
 
 
 ## Compiling from source
