@@ -4,7 +4,8 @@
 #include <cstring>
 #include <dlfcn.h>
 
-#define DEBUG
+#define EXT_NATIVE_SCRIPT_DEBUG
+#define DEBUG_MSG(X) printf(X)
 
 // max length of line in file that has function names of shared objects
 #define MAX_LINE_LEN 512
@@ -23,15 +24,32 @@ char *strrev(char *str) {
 }
 
 void *CreateHandle(const char *_sharedLibraryPath) {
+#ifdef EXT_NATIVE_SCRIPT_DEBUG
+  void *handle = dlopen(_sharedLibraryPath, RTLD_LAZY);
+  if (handle == NULL) {
+    DEBUG_MSG("Failed to create handle\n");
+    return nullptr;
+  }
+  return handle;
+#else
   return dlopen(_sharedLibraryPath, RTLD_LAZY);
+#endif
 }
 void Createhandle(const char *_sharedLibraryPath, void *_handle) {
+#ifdef EXT_NATIVE_SCRIPT_DEBUG
+  void *handle = dlopen(_sharedLibraryPath, RTLD_LAZY);
+  if (handle == NULL) {
+    DEBUG_MSG("Failed to create handle\n");
+  }
+  _handle = handle;
+#else
   _handle = dlopen(_sharedLibraryPath, RTLD_LAZY);
+#endif
 }
 
 char buffer[MAX_LINE_LEN];
 void GetFunctionCount(FILE *fd, int *_count) {
-#ifdef DEBUG
+#ifdef EXT_NATIVE_SCRIPT_DEBUG
   if (fd == NULL)
     return;
 #endif
@@ -47,7 +65,7 @@ void GetFunctionCount(FILE *fd, int *_count) {
 }
 int GetFunctionCount(FILE *fd) {
 
-#ifdef DEBUG
+#ifdef EXT_NATIVE_SCRIPT_DEBUG
   if (fd == NULL)
     return 0;
 #endif
@@ -72,13 +90,22 @@ void GetFunctionV(void *_handle, void *_fp, const char *_functionName) {
   _fp = dlsym(_handle, _functionName);
 }
 
-char **GetFunctionNames(const char *_sharedLibraryPath, int *_functionCount){
+char **GetFunctionNames(const char *_sharedLibraryPath, int *_functionCount) {
   char *tStr;
   char **rStr;
   tStr = (char *)malloc(sizeof(char) * strlen(_sharedLibraryPath));
   strcpy(tStr, _sharedLibraryPath);
   tStr = strtok(tStr, ".");
   strcat(tStr, ".txt");
+
+  // create command to create .txt
+  strcpy(buffer, "nm -gD ");
+  strcat(buffer, _sharedLibraryPath);
+  strcat(buffer, " | grep ' T ' | cut -c 20- > ");
+  strcat(buffer, tStr);
+
+  // run command
+  system(buffer);
 
   FILE *fd = fopen(tStr, "r");
   free(tStr);
