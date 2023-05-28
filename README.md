@@ -14,8 +14,8 @@ Native Scripting is licensed under the LGPLv3.
 ## Compiling from source
 
 0. Install dependencies.
-- - Ensure that you have CMake and git installed and accessible from shell.
-- - Optionally install clang-format to get5 a nicely formatted code.
+    * Ensure that you have CMake and git installed and accessible from shell.
+    * Optionally install clang-format to get5 a nicely formatted code.
 1. Open a shell which provides git and clone this repository
     ```git
     git clone https://github.com/CheralaSaiteja/NativeScripting.git
